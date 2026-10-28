@@ -59,6 +59,17 @@ describe('first-run setup', () => {
     expect(overview.checklist.find((x: { id: string }) => x.id === 'provider').done).toBe(false);
   });
 
+  it('checks only the configured domain when another visible zone is denied', async () => {
+    fake.state.denied = [/\/zones\/zone_example\//];
+    const c = new Client({ SETUP_DOMAIN: 'workspace.dev' });
+    await c.init();
+    const status = await c.get('/api/setup/status');
+    expect(status.zones.map((z: { name: string }) => z.name)).toEqual(['workspace.dev']);
+    for (const key of ['dns', 'zone_settings', 'email_routing_rules']) {
+      expect(status.permissions.find((p: { key: string }) => p.key === key).ok).toBe(true);
+    }
+  });
+
   it('generates the recovery key when the deploy set none, and claims with it', async () => {
     // A fresh deploy: no ENCRYPTION_KEY and no CF_API_TOKEN secret.
     const c = new Client({ ENCRYPTION_KEY: undefined, CF_API_TOKEN: undefined });

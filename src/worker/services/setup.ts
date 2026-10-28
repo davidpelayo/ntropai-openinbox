@@ -130,7 +130,9 @@ export async function setupStatus(env: Env, host: string, refresh = false): Prom
 
   let zones: SetupStatus['zones'] = [];
   try {
-    zones = (await listZones(cf, identity?.accountId)).map((z) => ({ id: z.id, name: z.name, status: z.status }));
+    zones = (await listZones(cf, identity?.accountId))
+      .filter((z) => !env.SETUP_DOMAIN || z.name === env.SETUP_DOMAIN)
+      .map((z) => ({ id: z.id, name: z.name, status: z.status }));
     checks.zones = zones.length
       ? { ok: true, count: zones.length, message: `${zones.length} domain${zones.length === 1 ? '' : 's'} found.` }
       : { ok: false, count: 0, message: 'No domains in this account. Add your domain to Cloudflare first, then reload.' };

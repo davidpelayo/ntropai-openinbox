@@ -13,6 +13,7 @@ export interface Env {
   MAILJET_API_BASE?: string;
   GITHUB_API_BASE?: string;
   WORKER_NAME?: string;
+  SETUP_DOMAIN?: string;
 }
 
 declare global {
